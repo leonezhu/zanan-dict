@@ -1,0 +1,15 @@
+# Python virtual environment
+venv/
+env/
+.env/
+.venv/
+zanan-backend/venv
+
+# Python cache files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# IDE settings
+.idea/
+.vscode/

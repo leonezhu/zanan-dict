@@ -1,0 +1,36 @@
+{
+    "word": "哈哈哈",
+    "languages": [
+        "zh-yue",
+        "en",
+        "zh",
+        "zh-sc"
+    ],
+    "results": {
+        "definitions": {
+            "zh-yue": {
+                "definition": "打招呼嘅用语",
+                "phonetic": "hēi"
+            },
+            "en": {
+                "definition": "A greeting or expression of goodwill",
+                "phonetic": "/həˈloʊ/"
+            },
+            "zh": {
+                "definition": "用于打招呼的用语",
+                "phonetic": "nǐ hǎo"
+            },
+            "zh-sc": {
+                "definition": "问候语，打招呼的话",
+                "phonetic": "nī hǎo"
+            }
+        },
+        "examples": {
+            "zh-yue": "喂，你今日点啊？",
+            "en": "Hello, how are you today?",
+            "zh": "你好，今天怎么样？",
+            "zh-sc": "倷好，今朝个咋样？"
+        }
+    },
+    "timestamp": "2025-02-19T15:48:02.438309"
+}
