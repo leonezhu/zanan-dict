@@ -1,29 +1,34 @@
-import { useState } from 'react'
+import { useState } from "react";
+
+import PropTypes from "prop-types";
 
 function Header({ onSearch }) {
-  const [word, setWord] = useState('')
-  const [selectedLanguages, setSelectedLanguages] = useState(['en', 'zh-yue'])
-  const [exampleCount, setExampleCount] = useState(2)
+  Header.propTypes = {
+    onSearch: PropTypes.func.isRequired,
+  };
+  const [word, setWord] = useState("");
+  const [selectedLanguages, setSelectedLanguages] = useState(["en", "zh-yue"]);
+  const [exampleCount, setExampleCount] = useState(2);
 
   const languages = [
-    { code: 'en', name: '英语' },
-    { code: 'zh-yue', name: '粤语' },
-    { code: 'zh', name: '普通话' },
-    { code: 'zh-sc', name: '四川话' }
-  ]
+    { code: "en", name: "英语" },
+    { code: "zh-yue", name: "粤语" },
+    { code: "zh", name: "普通话" },
+    { code: "zh-sc", name: "四川话" },
+  ];
 
   const handleLanguageChange = (code) => {
-    setSelectedLanguages(prev =>
+    setSelectedLanguages((prev) =>
       prev.includes(code)
-        ? prev.filter(lang => lang !== code)
+        ? prev.filter((lang) => lang !== code)
         : [...prev, code]
-    )
-  }
+    );
+  };
 
   const handleSubmit = async (e) => {
-    e.preventDefault()
-    onSearch(word, selectedLanguages, exampleCount)
-  }
+    e.preventDefault();
+    onSearch(word, selectedLanguages, exampleCount);
+  };
 
   return (
     <div className="header">
@@ -41,7 +46,7 @@ function Header({ onSearch }) {
             onChange={(e) => setExampleCount(Number(e.target.value))}
             className="example-count-select"
           >
-            {[1, 2, 3, 4, 5].map(count => (
+            {[1, 2, 3, 4, 5].map((count) => (
               <option key={count} value={count}>
                 {count}个例句
               </option>
@@ -51,7 +56,7 @@ function Header({ onSearch }) {
         </div>
 
         <div className="language-selector">
-          {languages.map(lang => (
+          {languages.map((lang) => (
             <label key={lang.code} className="language-option">
               <input
                 type="checkbox"
@@ -64,7 +69,7 @@ function Header({ onSearch }) {
         </div>
       </form>
     </div>
-  )
+  );
 }
 
-export default Header
+export default Header;
