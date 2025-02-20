@@ -3,6 +3,7 @@ import { useState } from 'react'
 function Header({ onSearch }) {
   const [word, setWord] = useState('')
   const [selectedLanguages, setSelectedLanguages] = useState(['en', 'zh-yue'])
+  const [exampleCount, setExampleCount] = useState(2)
 
   const languages = [
     { code: 'en', name: '英语' },
@@ -21,7 +22,7 @@ function Header({ onSearch }) {
 
   const handleSubmit = async (e) => {
     e.preventDefault()
-    onSearch(word, selectedLanguages)
+    onSearch(word, selectedLanguages, exampleCount)
   }
 
   return (
@@ -35,6 +36,17 @@ function Header({ onSearch }) {
             placeholder="请输入要查询的单词或短语"
             required
           />
+          <select
+            value={exampleCount}
+            onChange={(e) => setExampleCount(Number(e.target.value))}
+            className="example-count-select"
+          >
+            {[1, 2, 3, 4, 5].map(count => (
+              <option key={count} value={count}>
+                {count}个例句
+              </option>
+            ))}
+          </select>
           <button type="submit">查询</button>
         </div>
 

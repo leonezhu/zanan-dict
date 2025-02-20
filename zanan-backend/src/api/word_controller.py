@@ -12,19 +12,6 @@ dictionary_service = DictionaryService()
 
 @router.post("/api/query", response_model=QueryResponse)
 async def query_word(request: QueryRequest):
-    """查询单词接口
-    
-    接收前端的查询请求，返回多语言的单词释义、示例句子和音频URL。
-    
-    参数:
-        request (QueryRequest): 查询请求，包含要查询的单词和目标语言列表
-        
-    返回:
-        QueryResponse: 查询结果，包含各语言的释义、示例句子和音频URL
-        
-    异常:
-        HTTPException: 当查询失败时抛出异常
-    """
     try:
         # 参数验证
         if not request.word:
@@ -33,16 +20,10 @@ async def query_word(request: QueryRequest):
             raise HTTPException(status_code=400, detail="至少需要指定一种目标语言")
             
         # 调用服务层处理查询
-        result = await dictionary_service.query_word(request.word, request.languages)
+        result = await dictionary_service.query_word(request.word, request.languages, request.example_count)
         
-        # 构造响应
-        response = QueryResponse(
-            definitions=result["definitions"],
-            examples=result["examples"],
-            audio_urls={lang: "" for lang in request.languages}  # 暂时返回空URL，后续实现TTS功能
-        )
-        
-        return response
+        # 直接返回服务层生成的结果
+        return result
         
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
@@ -76,6 +57,47 @@ async def get_query_history():
         queries.sort(key=lambda x: x["timestamp"], reverse=True)
         
         return {"queries": queries}
+        
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+@router.delete("/api/queries/{timestamp}")
+async def delete_query_record(timestamp: float):
+    """删除指定的查询记录
+    
+    根据时间戳删除对应的查询记录文件。
+    
+    参数:
+        timestamp (float): 查询记录的时间戳
+    
+    返回:
+        dict: 删除操作的结果
+    
+    异常:
+        HTTPException: 当删除失败时抛出异常
+    """
+    try:
+        query_dir = dictionary_service.query_dir
+        if not os.path.exists(query_dir):
+            raise HTTPException(status_code=404, detail="查询记录目录不存在")
+        
+        # 查找对应时间戳的文件
+        target_file = None
+        for filename in os.listdir(query_dir):
+            if filename.endswith(".json"):
+                file_timestamp = float(filename.split("_")[1].replace(".json", ""))
+                if abs(file_timestamp - timestamp) < 0.001:  # 使用小数点后三位进行比较
+                    target_file = filename
+                    break
+        
+        if not target_file:
+            raise HTTPException(status_code=404, detail="未找到指定的查询记录")
+        
+        # 删除文件
+        file_path = os.path.join(query_dir, target_file)
+        os.remove(file_path)
+        
+        return {"message": "查询记录已删除"}
         
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))

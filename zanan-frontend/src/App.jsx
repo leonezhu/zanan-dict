@@ -32,7 +32,7 @@ function App() {
     }
   }
 
-  const handleSearch = async (word, selectedLanguages) => {
+  const handleSearch = async (word, selectedLanguages, exampleCount) => {
     try {
       const response = await fetch('http://localhost:8000/api/query', {
         method: 'POST',
@@ -41,15 +41,35 @@ function App() {
         },
         body: JSON.stringify({
           word,
-          languages: selectedLanguages
+          languages: selectedLanguages,
+          example_count: exampleCount
         })
       })
       const data = await response.json()
       setQueryResult(data)
       fetchQueryHistory()
-      setIsSidebarOpen(true) // 查询成功后显示侧边栏
     } catch (error) {
       console.error('查询失败:', error)
+    }
+  }
+
+  const handleDelete = async (timestamp) => {
+    try {
+      const response = await fetch(`http://localhost:8000/api/queries/${timestamp}`, {
+        method: 'DELETE'
+      })
+      if (response.ok) {
+        // 删除成功后更新历史记录列表
+        fetchQueryHistory()
+        // 如果当前显示的是被删除的记录，则清空显示
+        if (queryResult && queryResult.timestamp === timestamp) {
+          setQueryResult(null)
+        }
+      } else {
+        console.error('删除失败:', await response.text())
+      }
+    } catch (error) {
+      console.error('删除失败:', error)
     }
   }
 
@@ -63,6 +83,7 @@ function App() {
         queryHistory={queryHistory}
         languages={languages}
         onRecordClick={(record) => setQueryResult(record)}
+        onDelete={handleDelete}
       />
       <button
         className="toggle-history"
