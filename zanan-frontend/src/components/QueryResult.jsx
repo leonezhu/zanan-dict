@@ -7,6 +7,7 @@ Body.propTypes = {
       examples: PropTypes.object.isRequired,
     }).isRequired,
     word: PropTypes.string.isRequired,
+    timestamp: PropTypes.string
   }).isRequired,
   languages: PropTypes.arrayOf(PropTypes.object).isRequired,
 };
