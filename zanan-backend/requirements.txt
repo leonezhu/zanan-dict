@@ -1,6 +1,13 @@
 # Web 框架和服务器
 fastapi>=0.68.0,<0.69.0  # 高性能的现代 Web 框架
 uvicorn>=0.15.0,<0.16.0  # ASGI 服务器，用于运行 FastAPI 应用
+aiofiles>=23.0.0  # 异步文件操作库，用于 FileResponse
 
 # 数据验证和序列化
 pydantic>=1.8.0,<2.0.0  # 数据验证库，用于请求和响应模型
+
+# HTTP 客户端
+aiohttp>=3.8.0  # 异步 HTTP 客户端，用于调用外部服务
+
+# 文本转语音服务
+edge-tts>=6.1.9  # Microsoft Edge 的文本转语音服务

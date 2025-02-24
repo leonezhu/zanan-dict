@@ -18,7 +18,8 @@ async def query_word(request: QueryRequest):
             raise HTTPException(status_code=400, detail="单词不能为空")
         if not request.languages:
             raise HTTPException(status_code=400, detail="至少需要指定一种目标语言")
-            
+        
+        print(f"request: {request}")
         # 调用服务层处理查询
         result = await dictionary_service.query_word(request.word, request.languages, request.example_count)
         

@@ -1,6 +1,7 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from .api.word_controller import router
+from .api.word_controller import router as word_router
+from .api.audio_controller import router as audio_router
 
 app = FastAPI()
 
@@ -14,4 +15,5 @@ app.add_middleware(
 )
 
 # 注册路由
-app.include_router(router)
+app.include_router(word_router)
+app.include_router(audio_router)

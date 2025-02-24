@@ -13,3 +13,10 @@ __pycache__/
 # IDE settings
 .idea/
 .vscode/
+
+
+# Local configuration files
+zanan-backend/src/config_local.py
+
+queries/
+storage/

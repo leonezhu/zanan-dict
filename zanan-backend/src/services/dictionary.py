@@ -4,7 +4,7 @@ import os
 from datetime import datetime
 import asyncio
 from abc import ABC, abstractmethod
-from ..utils.audio import MockAudioGenerator as AudioGenerator
+from ..utils.audio import AudioGenerator
 
 class LanguageStrategy(Protocol):
     """语言策略接口
@@ -94,14 +94,34 @@ class DictionaryService:
         """
         # 首先生成基础英文例句
         base_examples = await self.generate_base_examples(word, count)
-        # 然后翻译成目标语言
+        print(f" base_examples: {base_examples}")
+        
+        # 如果目标语言是英语，直接返回基础例句
+        if language.lower() == "en":
+            return base_examples
+            
+        # 对于其他语言，翻译成目标语言
         strategy = self.get_strategy(language)
         return await strategy.translate_examples(base_examples)
     
     async def query_word(self, word: str, languages: List[str], example_count: int = 2) -> Dict:
+        # 首先生成基础英文例句
+        base_examples = await self.generate_base_examples(word, example_count)
+        print(f"Base examples generated: {base_examples}")
+        
         # 并行处理每种语言的查询
         definition_tasks = [self.generate_definition(word, lang) for lang in languages]
-        example_tasks = [self.generate_examples(word, lang, example_count) for lang in languages]
+        example_tasks = []
+        
+        # 根据语言生成翻译任务
+        for lang in languages:
+            if lang.lower() == "en":
+                # 英语直接使用基础例句
+                example_tasks.append(asyncio.create_task(asyncio.sleep(0, base_examples)))
+            else:
+                # 其他语言需要翻译
+                strategy = self.get_strategy(lang)
+                example_tasks.append(strategy.translate_examples(base_examples))
         
         # 等待所有异步任务完成
         definitions_list = await asyncio.gather(*definition_tasks)
@@ -118,18 +138,44 @@ class DictionaryService:
             results['definitions'][lang] = def_dict
         
         # 处理示例并生成音频URL
+        audio_tasks = []
         for lang, example_list in zip(languages, examples_list):
             lang_examples = []
             for example in example_list:
-                audio_url = self.audio_generator.generate_audio(example, lang, word)
+                # 创建音频生成任务
+                audio_task = self.audio_generator.generate_audio(example, lang, word)
+                audio_tasks.append(audio_task)
                 lang_examples.append({
                     'text': example,
-                    'audio_url': audio_url or ""
+                    'audio_url': ""
                 })
             results['examples'][lang] = lang_examples
         
-        # 保存查询记录
+        # 等待所有音频生成任务完成
+        audio_urls = await asyncio.gather(*audio_tasks)
+        
+        # 更新音频URL
+        audio_index = 0
+        for lang_examples in results['examples'].values():
+            for example in lang_examples:
+                audio_url = audio_urls[audio_index] or ""
+                
+                example['audio_url'] = audio_url
+                audio_index += 1
+        
+        # 创建完整的响应数据
+        response_data = {
+            'word': word,
+            'languages': languages,
+            'results': results,
+            'timestamp': datetime.utcnow().isoformat()
+        }
+        
+        # 所有音频生成完成后，保存查询记录
         await self.save_query_record(word, languages, results)
+        
+        # 返回完整的响应数据
+        return response_data
         
         # 返回与保存格式一致的数据结构
         return {
@@ -163,9 +209,18 @@ class DictionaryService:
 class ExampleGenerationService:
     """示例句子生成服务
     
-    负责调用外部服务 API 生成英文基础例句。
-    实际项目中需要替换为真实的服务调用。
+    负责调用 LLM 服务生成英文基础例句。
+    其他语言仍使用模拟数据。
     """
+    def __init__(self):
+        """初始化示例句子生成服务"""
+        from .llms.llm_service import LLMService
+        self.llm_service = LLMService()
+        self.default_examples = [
+            "The word {word} is useful.",
+            "I like the word {word}."
+        ]
+    
     async def generate_examples(self, word: str, count: int = 5) -> List[str]:
         """生成基础英文例句
         
@@ -176,15 +231,18 @@ class ExampleGenerationService:
         返回:
             List[str]: 生成的英文例句列表
         """
-        # TODO: 实现实际的服务调用
-        # 这里使用模拟数据作为示例
-        return [
-            f"How are you using {word} today?",
-            f"Nice to learn the word {word}!",
-            f"Welcome to our {word} meeting.",
-            f"What's the {word} like?",
-            f"Can you help me with {word}?"
-        ][:count]
+        try:
+            # 调用 LLM 服务生成例句
+            response = await self.llm_service.generate_examples(word, count)
+            if response and isinstance(response, list):
+                # 直接使用返回的例句列表
+                return response[:count]
+            
+        except Exception as e:
+            print(f"LLM 服务调用错误: {e}")
+        
+        # 发生错误时返回基础示例
+        return [example.format(word=word) for example in self.default_examples][:count]
 
 class MockLanguageStrategy:
     """模拟数据的语言策略基类"""
@@ -196,7 +254,15 @@ class MockLanguageStrategy:
         return self.definitions
     
     async def translate_examples(self, examples: List[str]) -> List[str]:
-        return [self.translated_examples.get(example, example) for example in examples]
+        # 对于每个例句，如果在预定义翻译中找不到，则生成一个基于模板的翻译
+        translated = []
+        for example in examples:
+            if example in self.translated_examples:
+                translated.append(self.translated_examples[example])
+            else:
+                # 如果没有预定义翻译，使用一个基本的翻译模板
+                translated.append(f"喂，{example}")
+        return translated
 
 class EnglishStrategy(MockLanguageStrategy):
     """英语策略实现类"""
@@ -212,19 +278,61 @@ class EnglishStrategy(MockLanguageStrategy):
             }
         )
 
-class CantoneseStrategy(MockLanguageStrategy):
+class CantoneseStrategy:
     """粤语策略实现类"""
     def __init__(self):
-        super().__init__(
-            {"definition": "打招呼嘅用语", "phonetic": "hēi"},
-            {
-                "How are you today?": "喂，你今日点啊？",
-                "Nice to meet you!": "喂，好开心见到你！",
-                "Welcome to our meeting.": "喂，大家好！欢迎来开会。",
-                "What's the weather like?": "喂，今日天气点啊？",
-                "Can you help me?": "喂，你可唔可以帮下我？"
-            }
-        )
+        """初始化粤语策略"""
+        from .llms.llm_service import LLMService
+        self.llm_service = LLMService()
+        self.default_definition = {"definition": "打招呼嘅用语", "phonetic": "hēi"}
+        self.default_translations = {
+            "How are you today?": "喂，你今日点啊？",
+            "Nice to meet you!": "喂，好开心见到你！",
+            "Welcome to our meeting.": "喂，大家好！欢迎来开会。",
+            "What's the weather like?": "喂，今日天气点啊？",
+            "Can you help me?": "喂，你可唔可以帮下我？"
+        }
+    
+    async def generate_definition(self, word: str) -> dict:
+        """生成单词定义和音标"""
+        return self.default_definition
+    
+    async def translate_examples(self, examples: List[str]) -> List[str]:
+        """翻译示例句子到粤语
+        
+        使用 LLM 服务将英语例句翻译成粤语。如果 LLM 服务调用失败，
+        则返回预定义的翻译或基础模板翻译。
+        
+        参数:
+            examples (List[str]): 要翻译的英语例句列表
+            
+        返回:
+            List[str]: 翻译后的粤语例句列表
+        """
+        translated = []
+        for example in examples:
+            try:
+                # 首先检查是否有预定义翻译
+                if example in self.default_translations:
+                    translated.append(self.default_translations[example])
+                    continue
+                    
+                # 使用 LLM 服务翻译
+                prompt = f"请将以下英语句子翻译成地道的广东粤语（使用繁体字）。要求：\n1. 使用日常对话中常见的粤语表达方式\n2. 确保符合粤语的语法结构和表达习惯\n3. 翻译要自然流畅，避免生硬的直译\n4.只返回翻译后的句子，不要添加任何其他说明\n5.翻译的句子中不要出现字母和符号，只包含粤语\n句子：{example}"
+                response = await self.llm_service.get_examples_with_prompt(prompt)
+                print(f" response: {response}")
+                if response and isinstance(response, str):
+                    translated.append(response)
+                else:
+                    # 如果 LLM 返回无效结果，使用基础模板
+                    translated.append(f"喂，{example}")
+                    
+            except Exception as e:
+                print(f"粤语翻译错误: {e}")
+                # 发生错误时使用基础模板
+                translated.append(f"喂，{example}")
+                
+        return translated
 
 class MandarinStrategy(MockLanguageStrategy):
     """普通话策略实现类"""
@@ -240,16 +348,58 @@ class MandarinStrategy(MockLanguageStrategy):
             }
         )
 
-class SichuaneseStrategy(MockLanguageStrategy):
+class SichuaneseStrategy:
     """四川话策略实现类"""
     def __init__(self):
-        super().__init__(
-            {"definition": "问候语，打招呼的话", "phonetic": "nī hǎo"},
-            {
-                "How are you today?": "倷好，今朝个咋样？",
-                "Nice to meet you!": "倷好，欢喜见到你哦！",
-                "Welcome to our meeting.": "大家好！欢迎参加我们个会。",
-                "What's the weather like?": "倷好，今朝个天气咋样？",
-                "Can you help me?": "倷好，帮我个忙嘛？"
-            }
-        )
+        """初始化四川话策略"""
+        from .llms.llm_service import LLMService
+        self.llm_service = LLMService()
+        self.default_definition = {"definition": "问候语，打招呼的话", "phonetic": "nī hǎo"}
+        self.default_translations = {
+            "How are you today?": "倷好，今朝个咋样？",
+            "Nice to meet you!": "倷好，欢喜见到你哦！",
+            "Welcome to our meeting.": "大家好！欢迎参加我们个会。",
+            "What's the weather like?": "倷好，今朝个天气咋样？",
+            "Can you help me?": "倷好，帮我个忙嘛？"
+        }
+    
+    async def generate_definition(self, word: str) -> dict:
+        """生成单词定义和音标"""
+        return self.default_definition
+    
+    async def translate_examples(self, examples: List[str]) -> List[str]:
+        """翻译示例句子到四川话
+        
+        使用 LLM 服务将英语例句翻译成四川话。如果 LLM 服务调用失败，
+        则返回预定义的翻译或基础模板翻译。
+        
+        参数:
+            examples (List[str]): 要翻译的英语例句列表
+            
+        返回:
+            List[str]: 翻译后的四川话例句列表
+        """
+        translated = []
+        for example in examples:
+            try:
+                # 首先检查是否有预定义翻译
+                if example in self.default_translations:
+                    translated.append(self.default_translations[example])
+                    continue
+                    
+                # 使用 LLM 服务翻译
+                prompt = f"请将以下英语句子翻译成四川话（使用简体字），不需要解释：\n{example}"
+                response = await self.llm_service.get_examples_with_prompt(prompt)
+                print(f" response: {response}")
+                if response and isinstance(response, str):
+                    translated.append(response)
+                else:
+                    # 如果 LLM 返回无效结果，使用基础模板
+                    translated.append(f"倷好，{example}")
+                    
+            except Exception as e:
+                print(f"四川话翻译错误: {e}")
+                # 发生错误时使用基础模板
+                translated.append(f"倷好，{example}")
+                
+        return translated

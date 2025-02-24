@@ -27,10 +27,10 @@ function HistoryPanel({
 
   const handleDelete = async (record, e) => {
     e.stopPropagation();
-    if (window.confirm(`确定要删除「${record.word}」的查询记录吗？`)) {
+    // if (window.confirm(`确定要删除「${record.word}」的查询记录吗？`)) {
       const timestamp = new Date(record.timestamp).getTime() / 1000; // 转换为秒级时间戳
       await onDelete(timestamp);
-    }
+    // }
   };
 
   return (

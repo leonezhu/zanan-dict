@@ -18,7 +18,7 @@
   border-radius: 12px;
   box-shadow: 0 2px 8px rgba(74, 144, 226, 0.1);
   width: 1000px;
-  margin-bottom: 1.5rem;
+  /* margin-bottom: 1.5rem; */
 }
 
 .results {
@@ -34,7 +34,7 @@
 }
 
 .header {
-  margin-bottom: 2rem;
+  margin-bottom: 1.5rem;
 }
 
 .input-group {
@@ -108,11 +108,129 @@
   color: #333;
 }
 
-.result-card {
-  background-color: #f8f9fa;
-  border-radius: 6px;
+.results-container {
   padding: 1rem;
+}
+
+.results-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 1rem;
+  /* margin-top: 1rem; */
+}
+
+.result-card {
+  background: #fff;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  padding: 1rem;
+}
+
+.language-title {
+  margin: 0 0 0.75rem 0;
+  font-size: 1.1rem;
+  color: #333;
+}
+
+.definition-section {
+  margin-bottom: 0.75rem;
+}
+
+.definition-item,
+.phonetic-item {
+  margin: 0.25rem 0;
+  font-size: 0.95rem;
+}
+
+.examples-section {
+  font-size: 0.9rem;
+}
+
+.example-item {
+  margin: 0.5rem 0;
+}
+
+.example-item p {
+  margin: 0.25rem 0;
+}
+
+.audio-player {
+  width: 100%;
+  height: 30px;
+  margin-top: 0.25rem;
+}
+
+.results h2 {
+  font-size: 1.2rem;
   margin-bottom: 1rem;
+  color: #333;
+}
+
+.results-container {
+  width: 100%;
+  max-width: 1400px;
+  /* margin: 0 auto; */
+  padding: 20px;
+  height: calc(100vh - 250px);
+  overflow-y: auto;
+  overflow-x: hidden;
+}
+
+.results-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 30px;
+  width: 100%;
+  max-width: 100%;
+}
+
+.result-card {
+  background: #fff;
+  border-radius: 12px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  padding: 20px;
+  /* width: 100%; */
+  min-width: 300px;
+  max-width: 500px;
+}
+
+.language-title {
+  color: #2c3e50;
+  margin-bottom: 15px;
+  padding-bottom: 10px;
+  border-bottom: 2px solid #eee;
+}
+
+.definition-section {
+  margin-bottom: 20px;
+}
+
+.definition-section p {
+  margin: 10px 0;
+  line-height: 1.6;
+}
+
+.examples-section {
+  background: #f8f9fa;
+  padding: 15px;
+  border-radius: 8px;
+}
+
+.example-item {
+  margin-bottom: 15px;
+  padding-bottom: 15px;
+  border-bottom: 1px solid #eee;
+}
+
+.example-item:last-child {
+  border-bottom: none;
+  margin-bottom: 0;
+  padding-bottom: 0;
+}
+
+.audio-player {
+  width: 100%;
+  margin-top: 10px;
 }
 
 .result-card h3 {
@@ -129,8 +247,8 @@
 .sidebar {
   position: fixed;
   top: 0;
-  left: -260px;
-  width: 260px;
+  left: -230px;
+  width: 200px;
   height: 100vh;
   background-color: #fff;
   box-shadow: 2px 0 8px rgba(0, 0, 0, 0.1);
