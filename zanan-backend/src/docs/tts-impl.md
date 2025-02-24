@@ -1,4 +1,4 @@
-## 一种文本转语言方案，免费的接口
+## 一种文本转语言方案，[免费的tts接口](https://czyt.tech/post/a-free-tts-api/)
 https://dds.dui.ai/runtime/v1/synthesize?voiceId=wqingf_csn&text=您好世界&speed=1&volume=50&audioType=wav
 其中关键参数为
 voiceId：语言 id，对应哪种口语方言，主要的映射有：
