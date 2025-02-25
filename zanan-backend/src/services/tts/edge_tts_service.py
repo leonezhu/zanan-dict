@@ -3,7 +3,7 @@ import os
 import edge_tts
 import asyncio
 
-class TTSService:
+class EdgeTTSService:
     """文本转语音服务
     
     使用 Edge TTS 实现多语言的语音生成功能。

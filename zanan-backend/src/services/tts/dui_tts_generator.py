@@ -7,26 +7,27 @@ class DuiTTSGenerator(BaseAudioGenerator):
     """讯飞开放平台音频生成器实现类
     
     使用讯飞开放平台的 TTS 服务生成音频文件。
-    支持四川话、粤语等多种方言的语音生成。
+    专门用于四川话的语音生成。
+    
+    支持的语言代码：
+    - zh-sc: 四川话
     """
     
-    def __init__(self, storage_dir: str):
+    def __init__(self):
         """初始化讯飞开放平台音频生成器
-        
-        参数:
-            storage_dir (str): 音频文件存储目录
         """
-        super().__init__(storage_dir)
+        super().__init__()
         self.tts_service = DuiTTSService()
     
     async def generate_audio(self, text: str, language: str, word: str) -> Optional[str]:
         """生成音频文件
         
         将给定文本转换为语音，并保存为音频文件。
+        仅支持四川话。
         
         参数:
             text (str): 要转换的文本内容
-            language (str): 目标语言代码（如 'en', 'zh'）
+            language (str): 目标语言代码（'zh-sc'）
             word (str): 相关单词，用于生成文件名
             
         返回:

@@ -1,5 +1,6 @@
 from typing import Dict, List, Optional, Protocol
 import os
+from src.config import STORAGE_DIR
 
 class AudioGeneratorStrategy(Protocol):
     """音频生成器策略接口
@@ -26,13 +27,12 @@ class BaseAudioGenerator:
     
     提供基础的文件存储和路径管理功能。
     """
-    def __init__(self, storage_dir: str):
+    def __init__(self):
         """初始化音频生成器
         
-        参数:
-            storage_dir (str): 音频文件存储目录
+        使用全局配置的存储路径初始化音频文件目录。
         """
-        self.audio_dir = os.path.join(storage_dir, "audio")
+        self.audio_dir = os.path.join(STORAGE_DIR, "audio")
         os.makedirs(self.audio_dir, exist_ok=True)
     
     def get_audio_path(self, word: str, language: str, text: str) -> str:

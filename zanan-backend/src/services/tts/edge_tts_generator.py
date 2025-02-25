@@ -2,32 +2,35 @@ from typing import Optional
 import asyncio
 import os
 from ...utils.audio_base import BaseAudioGenerator
-from .tts_service import TTSService
+from .edge_tts_service import EdgeTTSService
 
 class EdgeTTSGenerator(BaseAudioGenerator):
     """Edge TTS 音频生成器实现类
     
     使用 Edge TTS 服务生成音频文件。
-    支持多种语言的语音生成。
+    支持英语、普通话和粤语的语音生成。
+    
+    支持的语言代码：
+    - en: 英语
+    - zh: 普通话
+    - zh-yue: 粤语
     """
     
-    def __init__(self, storage_dir: str):
+    def __init__(self):
         """初始化 Edge TTS 音频生成器
-        
-        参数:
-            storage_dir (str): 音频文件存储目录
         """
-        super().__init__(storage_dir)
-        self.tts_service = TTSService()
+        super().__init__()
+        self.tts_service = EdgeTTSService()
     
     async def generate_audio(self, text: str, language: str, word: str) -> Optional[str]:
         """生成音频文件
         
         将给定文本转换为语音，并保存为 MP3 文件。
+        仅支持英语、普通话和粤语。
         
         参数:
             text (str): 要转换的文本内容
-            language (str): 目标语言代码（如 'en', 'zh'）
+            language (str): 目标语言代码（'en', 'zh', 'zh-yue'）
             word (str): 相关单词，用于生成文件名
             
         返回:

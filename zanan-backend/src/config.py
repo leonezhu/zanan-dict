@@ -3,6 +3,9 @@ try:
 except ImportError:
     LLM_CONFIG_LOCAL = {}
 
+# 全局存储路径配置
+STORAGE_DIR = "storage"
+
 LLM_CONFIG = {
     "siliconflow": {
         "api_url": "https://api.siliconflow.cn/v1/chat/completions",
@@ -19,7 +22,7 @@ LLM_CONFIG_LOCAL = {
 
 # 提示词模板配置
 PROMPT_TEMPLATES = {
-    "definition": """请为英文单词 "{word}" 生成一个完整的定义。
+    "definition": """请为词语 "{word}" 生成一个完整的定义。
 要求：
 1. 返回 JSON 格式的字符串
 2. 包含以下字段：
@@ -32,7 +35,7 @@ PROMPT_TEMPLATES = {
 }}
 """,
     
-    "examples": """请为英文单词 "{word}" 生成 {count} 个地道的英文例句。
+    "examples": """请为词语 "{word}" 生成 {count} 个地道的英文例句。
 要求：
 1. 返回 JSON 格式的字符串
 2. 包含一个例句数组
