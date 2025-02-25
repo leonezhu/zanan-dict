@@ -92,7 +92,10 @@ function App() {
         onClose={() => setIsSidebarOpen(false)}
         queryHistory={queryHistory}
         languages={languages}
-        onRecordClick={(record) => setQueryResult(record)}
+        onRecordClick={(record) => {
+          setQueryResult(record);
+          // setIsSidebarOpen(false);
+        }}
         onDelete={handleDelete}
       />
       <div className="header-buttons">

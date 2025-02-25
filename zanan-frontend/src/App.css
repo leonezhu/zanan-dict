@@ -247,19 +247,20 @@
 .sidebar {
   position: fixed;
   top: 0;
-  left: -230px;
+  left: 0;
   width: 200px;
   height: 100vh;
   background-color: #fff;
   box-shadow: 2px 0 8px rgba(0, 0, 0, 0.1);
-  transition: left 0.3s ease;
+  transition: transform 0.3s ease;
   z-index: 1000;
   padding: 2rem;
   overflow-y: auto;
+  transform: translateX(-100%);
 }
 
 .sidebar.open {
-  left: 0;
+  transform: translateX(0);
 }
 
 .close-button {
@@ -409,5 +410,77 @@
     bottom: 1rem;
     min-width: 100px;
     padding: 0.6rem 1rem;
+  }
+}
+@media (max-width: 768px) {
+  .container {
+    padding: 1rem;
+  }
+
+  .search-form {
+    width: 100%;
+    padding: 1rem;
+  }
+
+  .results {
+    width: 100%;
+    padding: 1rem;
+  }
+
+  .input-group {
+    flex-direction: column;
+  }
+
+  .language-selector {
+    gap: 1rem;
+  }
+
+  .language-option {
+    font-size: 0.9rem;
+  }
+
+  .header-buttons {
+    top: 8px;
+    right: 8px;
+    gap: 4px;
+  }
+
+  .toggle-history {
+    font-size: 0.9rem;
+    padding: 6px 12px;
+  }
+
+  .config-button {
+    font-size: 18px;
+    padding: 6px;
+  }
+
+  .sidebar {
+    width: 100%;
+    max-width: none;
+    left: -100%;
+    padding: 1rem;
+    transition: transform 0.3s ease;
+  }
+
+  .sidebar.open {
+    transform: translateX(100%);
+  }
+
+  .history-card {
+    padding: 0.6rem;
+    margin-bottom: 0.6rem;
+  }
+
+  .history-card h3 {
+    font-size: 0.9rem;
+  }
+
+  .history-time {
+    font-size: 0.75rem;
+  }
+
+  .history-languages {
+    font-size: 0.8rem;
   }
 }
