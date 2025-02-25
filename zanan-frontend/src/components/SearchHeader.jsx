@@ -9,6 +9,7 @@ function Header({ onSearch }) {
   const [word, setWord] = useState("");
   const [selectedLanguages, setSelectedLanguages] = useState(["en", "zh-yue"]);
   const [exampleCount, setExampleCount] = useState(2);
+  const [isLoading, setIsLoading] = useState(false);
 
   const languages = [
     { code: "en", name: "英语" },
@@ -27,7 +28,13 @@ function Header({ onSearch }) {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    onSearch(word, selectedLanguages, exampleCount);
+    if (isLoading) return;
+    setIsLoading(true);
+    try {
+      await onSearch(word, selectedLanguages, exampleCount);
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
@@ -40,11 +47,13 @@ function Header({ onSearch }) {
             onChange={(e) => setWord(e.target.value)}
             placeholder="请输入要查询的单词或短语"
             required
+            disabled={isLoading}
           />
           <select
             value={exampleCount}
             onChange={(e) => setExampleCount(Number(e.target.value))}
             className="example-count-select"
+            disabled={isLoading}
           >
             {[1, 2, 3, 4, 5].map((count) => (
               <option key={count} value={count}>
@@ -52,7 +61,9 @@ function Header({ onSearch }) {
               </option>
             ))}
           </select>
-          <button type="submit">查询</button>
+          <button type="submit" disabled={isLoading}>
+            {isLoading ? "查询中..." : "查询"}
+          </button>
         </div>
 
         <div className="language-selector">

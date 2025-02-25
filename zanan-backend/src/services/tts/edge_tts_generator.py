@@ -1,7 +1,7 @@
 from typing import Optional
 import asyncio
 import os
-from ...utils.audio_base import BaseAudioGenerator
+from ..audio_base import BaseAudioGenerator
 from .edge_tts_service import EdgeTTSService
 
 class EdgeTTSGenerator(BaseAudioGenerator):

@@ -1,7 +1,7 @@
 from typing import Optional
 import asyncio
-from src.utils.audio_base import BaseAudioGenerator
-from src.services.tts.dui_tts_service import DuiTTSService
+from ..audio_base import BaseAudioGenerator
+from .dui_tts_service import DuiTTSService
 
 class DuiTTSGenerator(BaseAudioGenerator):
     """讯飞开放平台音频生成器实现类

@@ -5,7 +5,7 @@ import json
 from datetime import datetime
 
 from ..models.schemas import QueryRequest, QueryResponse
-from ..services.dictionary import DictionaryService
+from ..services.dictionary_service import DictionaryService
 
 router = APIRouter()
 dictionary_service = DictionaryService()

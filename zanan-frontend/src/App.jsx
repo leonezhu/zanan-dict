@@ -3,11 +3,13 @@ import './App.css'
 import SearchHeader from './components/SearchHeader'
 import QueryResult from './components/QueryResult'
 import HistoryPanel from './components/HistoryPanel'
+import ConfigPanel from './components/ConfigPanel'
 
 function App() {
   const [queryResult, setQueryResult] = useState(null)
   const [queryHistory, setQueryHistory] = useState([])
   const [isSidebarOpen, setIsSidebarOpen] = useState(false)
+  const [isConfigOpen, setIsConfigOpen] = useState(false)
 
   const languages = [
     { code: 'en', name: '英语' },
@@ -22,9 +24,15 @@ function App() {
     return () => clearInterval(interval)
   }, [])
 
+  const getBackendUrl = () => {
+    const savedUrl = localStorage.getItem('backendUrl')
+    return savedUrl || 'http://localhost:8000'
+  }
+
   const fetchQueryHistory = async () => {
     try {
-      const response = await fetch('http://localhost:8000/api/queries')
+      const backendUrl = getBackendUrl()
+      const response = await fetch(`${backendUrl}/api/queries`)
       const data = await response.json()
       setQueryHistory(data.queries)
     } catch (error) {
@@ -34,7 +42,8 @@ function App() {
 
   const handleSearch = async (word, selectedLanguages, exampleCount) => {
     try {
-      const response = await fetch('http://localhost:8000/api/query', {
+      const backendUrl = getBackendUrl()
+      const response = await fetch(`${backendUrl}/api/query`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -55,7 +64,8 @@ function App() {
 
   const handleDelete = async (timestamp) => {
     try {
-      const response = await fetch(`http://localhost:8000/api/queries/${timestamp}`, {
+      const backendUrl = getBackendUrl()
+      const response = await fetch(`${backendUrl}/api/queries/${timestamp}`, {
         method: 'DELETE'
       })
       if (response.ok) {
@@ -85,12 +95,21 @@ function App() {
         onRecordClick={(record) => setQueryResult(record)}
         onDelete={handleDelete}
       />
-      <button
-        className="toggle-history"
-        onClick={() => setIsSidebarOpen(!isSidebarOpen)}
-      >
-        {isSidebarOpen ? '隐藏历史' : '显示历史'}
-      </button>
+      <div className="header-buttons">
+        <button
+          className="toggle-history"
+          onClick={() => setIsSidebarOpen(!isSidebarOpen)}
+        >
+          {isSidebarOpen ? '隐藏历史' : '显示历史'}
+        </button>
+        <button
+          className="config-button"
+          onClick={() => setIsConfigOpen(true)}
+        >
+          ⚙️
+        </button>
+      </div>
+      <ConfigPanel isOpen={isConfigOpen} onClose={() => setIsConfigOpen(false)} />
     </div>
   )
 }

@@ -315,22 +315,42 @@
   margin: 0.3rem 0 0;
 }
 
+.header-buttons {
+  position: absolute;
+  top: 16px;
+  right: 16px;
+  display: flex;
+  gap: 8px;
+  z-index: 1001;
+}
+
 .toggle-history {
-  position: fixed;
-  bottom: 1rem;
-  right: 1rem;
   background-color: #4a90e2;
   color: white;
   border: none;
   border-radius: 4px;
-  padding: 0.4rem 0.8rem;
-  font-size: 0.9rem;
+  padding: 8px 16px;
+  font-size: 14px;
   cursor: pointer;
-  z-index: 1001;
+  transition: background-color 0.2s;
 }
 
 .toggle-history:hover {
   background-color: #357abd;
+}
+
+.config-button {
+  background: none;
+  border: none;
+  font-size: 20px;
+  cursor: pointer;
+  padding: 8px;
+  border-radius: 4px;
+  transition: background-color 0.2s;
+}
+
+.config-button:hover {
+  background-color: rgba(0, 0, 0, 0.1);
 }
 
 .history-languages {
