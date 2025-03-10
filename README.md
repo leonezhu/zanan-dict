@@ -1,43 +1,15 @@
-# Zanan Dictionary 后端服务
-
-## 项目结构
-
-```
-zanan-backend/
-├── README.md           # 项目说明文档
-├── requirements.txt    # 项目依赖
-├── .env.example       # 环境变量示例文件
-└── src/               # 源代码目录
-    ├── __init__.py
-    ├── main.py        # 应用入口
-    ├── api/           # API 路由模块
-    │   ├── __init__.py
-    │   └── routes.py
-    ├── models/        # 数据模型
-    │   ├── __init__.py
-    │   └── schemas.py
-    ├── services/      # 业务逻辑
-    │   ├── __init__.py
-    │   ├── dictionary.py
-    │   └── storage.py
-    └── utils/         # 工具函数
-        ├── __init__.py
-        └── audio.py
-```
-
-## 环境要求
-
-- Python 3.8+
-
-## 主要依赖
-
-- FastAPI: 现代、快速的 Web 框架
-- Uvicorn: ASGI 服务器
-- Pydantic: 数据验证库
-
 ## 本地开发环境配置
+0. 在zanan--backend目录下创建config_local.py文件，内容如下：
+```
+# 白嫖的硅基流动免费大模型，所以要配置对应 api_key
+LLM_CONFIG_LOCAL = {
+    "siliconflow": {
+        "api_key": "sk-xxxx"
+    }
+}
+```
 
-1. 进入项目目录并创建虚拟环境：
+1. 后端第一次执行：进入项目目录并创建虚拟环境：
 
 ```bash
 # 进入项目根目录
@@ -59,11 +31,17 @@ python3 --version
 deactivate
 ```
 
+**看到start-backend.sh 文件了吗，之后可以在根目录下一键运行后端**   
+> ./start-backend.sh
+
+
 注意事项：
 - 如果激活命令失败，请确保 Python 和 venv 模块已正确安装
 - Windows 用户如遇到执行策略限制，可以使用管理员权限运行 PowerShell 并执行：`Set-ExecutionPolicy RemoteSigned`
 - 每次开发前都需要先激活虚拟环境
 - 完成开发后建议退出虚拟环境
+
+
 
 2. 安装项目依赖：
 
@@ -72,7 +50,7 @@ deactivate
 pip3 install -r requirements.txt
 ```
 
-3. 启动开发服务器：
+3. 启动后端开发服务器：
 
 ```bash
 # 在项目根目录下运行
@@ -81,6 +59,16 @@ uvicorn src.main:app --reload --port 8000
 
 服务器将在 http://localhost:8000 启动，支持热重载。
 可以通过 http://localhost:8000/docs 访问 API 文档。
+
+4. 启动前端页面
+```bash
+# 进入项目根目录
+cd zanan-frontend
+
+# 执行命令
+npm install #第一次需要安装依赖
+npm run dev
+```
 
 ## 开发注意事项
 
@@ -95,3 +83,8 @@ pip freeze > requirements.txt
 ```bash
 uvicorn src.main:app --reload --port <端口号>
 ```
+
+## TODO
+- [x] 对查询词本身进行翻译和转语音
+- [x] 前端添加随机按钮，随机查询一个词，可以设置哪些方面，比如职场、生活等
+- [x] 页面右侧添加配置项，比如哪个语言用哪个发音等，所有的配置需要统一到一个 json 中

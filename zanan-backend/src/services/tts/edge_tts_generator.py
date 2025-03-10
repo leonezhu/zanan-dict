@@ -6,7 +6,7 @@ from .edge_tts_service import EdgeTTSService
 
 class EdgeTTSGenerator(BaseAudioGenerator):
     """Edge TTS 音频生成器实现类
-    
+    https://www.bingal.com/posts/edge-tts-usage
     使用 Edge TTS 服务生成音频文件。
     支持英语、普通话和粤语的语音生成。
     
