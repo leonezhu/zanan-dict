@@ -13,6 +13,7 @@ function App() {
   const [isConfigOpen, setIsConfigOpen] = useState(false)
   const [exampleCount, setExampleCount] = useState(2)
   const [randomStyle, setRandomStyle] = useState('work')
+  const [searchWord, setSearchWord] = useState('')
 
   const languages = [
     { code: 'en', name: '英语' },
@@ -117,6 +118,8 @@ function App() {
       <SearchHeader 
         onSearch={(word, selectedLanguages) => handleSearch(word, selectedLanguages, exampleCount)}
         onRandomSearch={(selectedLanguages) => handleRandomSearch(selectedLanguages)}
+        searchWord={searchWord}
+        setSearchWord={setSearchWord}
       />
       <QueryResult queryResult={queryResult} languages={languages} />
       <HistoryPanel
@@ -126,6 +129,7 @@ function App() {
         languages={languages}
         onRecordClick={(record) => {
           setQueryResult(record);
+          setSearchWord(record.word);
           // setIsSidebarOpen(false);
         }}
         onDelete={handleDelete}

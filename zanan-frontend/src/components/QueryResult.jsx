@@ -35,7 +35,7 @@ function Body({ queryResult, languages }) {
               </p>
             </div>
             <div className="examples-section">
-              <strong>示例：</strong>
+              {/* <strong>示例：</strong> */}
               {examples[lang]?.map((example, index) => (
                 <div key={`${lang}-${index}-${queryResult.word}`} className="example-item">
                   <p>{example.text}</p>

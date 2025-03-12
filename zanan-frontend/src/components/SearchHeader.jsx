@@ -2,12 +2,13 @@ import { useState } from "react";
 
 import PropTypes from "prop-types";
 
-function Header({ onSearch, onRandomSearch }) {
+function Header({ onSearch, onRandomSearch, searchWord, setSearchWord }) {
   Header.propTypes = {
     onSearch: PropTypes.func.isRequired,
     onRandomSearch: PropTypes.func.isRequired,
+    searchWord: PropTypes.string.isRequired,
+    setSearchWord: PropTypes.func.isRequired,
   };
-  const [word, setWord] = useState("");
   const [selectedLanguages, setSelectedLanguages] = useState(["en", "zh-yue"]);
   const [isLoading, setIsLoading] = useState(false);
 
@@ -56,8 +57,8 @@ function Header({ onSearch, onRandomSearch }) {
         <div className="input-group">
           <input
             type="text"
-            value={word}
-            onChange={(e) => setWord(e.target.value)}
+            value={searchWord}
+            onChange={(e) => setSearchWord(e.target.value)}
             placeholder="请输入要查询的单词或短语"
             required
             disabled={isLoading}

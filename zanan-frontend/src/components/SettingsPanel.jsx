@@ -12,7 +12,7 @@ function SettingsPanel({ exampleCount, onExampleCountChange, randomStyle, onRand
   return (
     <div className="settings-panel">
       <div className="settings-card">
-        <h3>查询设置</h3>
+        {/* <h3>查询设置</h3> */}
         <div className="settings-item example-count-wrapper">
           <label>例句数量：</label>
           <select
