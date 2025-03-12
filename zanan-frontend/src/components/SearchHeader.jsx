@@ -32,7 +32,7 @@ function Header({ onSearch, onRandomSearch, searchWord, setSearchWord }) {
     if (isLoading) return;
     setIsLoading(true);
     try {
-      await onSearch(word, selectedLanguages);
+      await onSearch(searchWord, selectedLanguages);
     } finally {
       setIsLoading(false);
     }
@@ -44,7 +44,7 @@ function Header({ onSearch, onRandomSearch, searchWord, setSearchWord }) {
     try {
       const randomWord = await onRandomSearch(selectedLanguages);
       if (randomWord) {
-        setWord(randomWord); // 更新搜索框内容为随机单词
+        setSearchWord(randomWord); // 更新搜索框内容为随机单词
       }
     } finally {
       setIsLoading(false);
