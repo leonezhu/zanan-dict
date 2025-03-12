@@ -48,5 +48,28 @@ PROMPT_TEMPLATES = {
         "She said hello to everyone at the party."
     ]
 }}
+""",
+
+    "random_word": """请根据以下条件生成一个英文单词：
+1. 风格类型：{style}
+2. 时间戳：{timestamp}
+3. 风格详细说明：
+   - work: 与工作、职场相关的词汇
+   - life: 日常生活中常用的词汇
+   - computer: 计算机、技术相关的词汇
+   - study: 学术、教育相关的词汇
+
+要求：
+1. 返回 JSON 格式的字符串
+2. 包含一个 word 字段
+3. 单词应该是常用的、适合学习的英文单词
+4. 根据时间戳作为随机种子，生成不同的单词
+5. 确保生成的单词与指定的风格类型相符
+
+示例输出：
+{{
+    "word": "collaboration"
+}}
 """
+
 }

@@ -167,3 +167,48 @@ class LLMService:
             count=count
         )
         return await self.llm.generate_response(prompt)
+
+    _recent_words = []  # 类变量，用于存储最近生成的单词
+    _max_recent_words = 50  # 最多保存的最近单词数量
+
+    async def generate_random_word(self, style: str) -> Optional[str]:
+        """生成随机单词
+
+        Args:
+            style (str): 单词风格，可选值：work, life, computer, study
+
+        Returns:
+            Optional[str]: 生成的单词，如果请求失败则返回 None
+        """
+        import time
+        current_timestamp = int(time.time())
+        prompt = PROMPT_TEMPLATES["random_word"].format(
+            style=style,
+            timestamp=current_timestamp  # 将时间戳作为随机种子传入模板
+        )
+        
+        max_attempts = 3  # 最大尝试次数
+        for _ in range(max_attempts):
+            response = await self.llm.generate_response(prompt)
+            if response:
+                try:
+                    import json
+                    result = json.loads(response)
+                    word = result.get("word")
+                    
+                    # 如果生成的单词在最近列表中，继续尝试
+                    if word in self._recent_words:
+                        continue
+                        
+                    # 将新单词添加到最近列表
+                    self._recent_words.append(word)
+                    # 如果列表超过最大长度，移除最早的单词
+                    if len(self._recent_words) > self._max_recent_words:
+                        self._recent_words.pop(0)
+                        
+                    return word
+                except json.JSONDecodeError:
+                    print(f"JSON 解析错误: {response}")
+                except Exception as e:
+                    print(f"生成随机单词错误: {str(e)}")
+        return None

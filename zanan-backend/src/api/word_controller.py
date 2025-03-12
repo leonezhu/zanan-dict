@@ -4,7 +4,7 @@ import os
 import json
 from datetime import datetime
 
-from ..models.schemas import QueryRequest, QueryResponse
+from ..models.schemas import QueryRequest, QueryResponse, RandomWordRequest
 from ..services.dictionary_service import DictionaryService
 
 router = APIRouter()
@@ -99,6 +99,38 @@ async def delete_query_record(timestamp: float):
         os.remove(file_path)
         
         return {"message": "查询记录已删除"}
+        
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+@router.post("/api/random")
+async def generate_random_word(request: RandomWordRequest):
+    """生成随机单词并返回查询结果
+    
+    根据指定的风格生成一个随机单词，并返回该单词的完整查询结果。
+    
+    参数:
+        request (RandomWordRequest): 包含风格、目标语言列表和例句数量的请求对象
+    
+    返回:
+        dict: 包含随机单词的完整查询结果
+    
+    异常:
+        HTTPException: 当生成或查询失败时抛出异常
+    """
+    try:
+        if not request.languages:
+            raise HTTPException(status_code=400, detail="至少需要指定一种目标语言")
+        
+        # 调用服务层生成随机单词
+        word = await dictionary_service.generate_random_word(request.style)
+        if not word:
+            raise HTTPException(status_code=500, detail="随机单词生成失败")
+        
+        # 使用生成的单词调用查询接口
+        result = await dictionary_service.query_word(word, request.languages, request.example_count)
+        
+        return result
         
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))

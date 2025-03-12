@@ -2,13 +2,13 @@ import { useState } from "react";
 
 import PropTypes from "prop-types";
 
-function Header({ onSearch }) {
+function Header({ onSearch, onRandomSearch }) {
   Header.propTypes = {
     onSearch: PropTypes.func.isRequired,
+    onRandomSearch: PropTypes.func.isRequired,
   };
   const [word, setWord] = useState("");
   const [selectedLanguages, setSelectedLanguages] = useState(["en", "zh-yue"]);
-  const [exampleCount, setExampleCount] = useState(2);
   const [isLoading, setIsLoading] = useState(false);
 
   const languages = [
@@ -31,7 +31,20 @@ function Header({ onSearch }) {
     if (isLoading) return;
     setIsLoading(true);
     try {
-      await onSearch(word, selectedLanguages, exampleCount);
+      await onSearch(word, selectedLanguages);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleRandomClick = async () => {
+    if (isLoading) return;
+    setIsLoading(true);
+    try {
+      const randomWord = await onRandomSearch(selectedLanguages);
+      if (randomWord) {
+        setWord(randomWord); // 更新搜索框内容为随机单词
+      }
     } finally {
       setIsLoading(false);
     }
@@ -49,20 +62,16 @@ function Header({ onSearch }) {
             required
             disabled={isLoading}
           />
-          <select
-            value={exampleCount}
-            onChange={(e) => setExampleCount(Number(e.target.value))}
-            className="example-count-select"
-            disabled={isLoading}
-          >
-            {[1, 2, 3, 4, 5].map((count) => (
-              <option key={count} value={count}>
-                {count}个例句
-              </option>
-            ))}
-          </select>
           <button type="submit" disabled={isLoading}>
             {isLoading ? "查询中..." : "查询"}
+          </button>
+          <button
+            type="button"
+            onClick={handleRandomClick}
+            disabled={isLoading}
+            className="random-button"
+          >
+            随一个
           </button>
         </div>
 

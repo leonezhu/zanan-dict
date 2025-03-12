@@ -61,3 +61,16 @@ class QueryResponse(BaseModel):
     languages: List[str]
     results: Dict[str, Dict[str, Union[Definition, List[Example]]]]
     timestamp: str
+
+# 随机单词请求模型
+class RandomWordRequest(BaseModel):
+    """随机单词请求模型
+    
+    属性:
+        style (str): 随机单词的风格，如'work'（职场）、'life'（生活）等
+        languages (List[str]): 需要查询的语言列表
+        example_count (int): 每种语言生成的示例句子数量，默认为 2
+    """
+    style: str
+    languages: List[str]
+    example_count: int = 2

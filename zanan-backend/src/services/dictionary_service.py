@@ -1,4 +1,4 @@
-from typing import Dict, List
+from typing import Dict, List, Optional
 import json
 import os
 from datetime import datetime
@@ -110,6 +110,17 @@ class DictionaryService:
         # 对于其他语言，翻译成目标语言
         strategy = self.get_strategy(language)
         return await strategy.translate_examples(base_examples)
+    
+    async def generate_random_word(self, style: str) -> Optional[str]:
+        """生成随机单词
+    
+        参数:
+            style (str): 单词风格，可选值：work, life, computer, study
+    
+        返回:
+            Optional[str]: 生成的单词，如果生成失败则返回 None
+        """
+        return await self.llm_service.generate_random_word(style)
     
     async def query_word(self, word: str, languages: List[str], example_count: int = 2) -> Dict:
         # 首先生成基础英文例句
