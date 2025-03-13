@@ -40,13 +40,19 @@ class SichuaneseStrategy(LanguageStrategy):
             
             # 如果不是中文词，需要翻译
             if not is_chinese_word:
-                prompt = f"请将英文单词 '{word}' 翻译成中文。要求：\n1. 只返回对应的中文词，不要其他解释\n2. 如果有多个含义，只返回最常用的一个"
+                prompt = f"Please translate the English word '{word}' to Chinese. Requirements:\n1. Return ONLY the Chinese word\n2. If multiple meanings exist, return ONLY the most common one\n3. Do not include any explanations or additional text"
+                response = await self.llm_service.get_examples_with_prompt(prompt)
+                if response and isinstance(response, str):
+                    pronounce_word = response.strip()
+            # 如果是中文词，转换为地道的四川话用词
+            else:
+                prompt = f"Translate '{word}' to Sichuan dialect. Requirements:\n1. Return ONLY the Sichuan dialect word in Simplified Chinese characters\n2. If multiple expressions exist, return ONLY the most commonly used one\n3. Do not include any explanations or additional text"
                 response = await self.llm_service.get_examples_with_prompt(prompt)
                 if response and isinstance(response, str):
                     pronounce_word = response.strip()
             
             # 生成定义和音标
-            prompt = f"请提供单词 '{pronounce_word}' 的四川话解释及拼音。要求：\n1. 使用简体字。\n2. 解释简洁易懂，避免混杂其他语言或符号。\n3. 使用四川话拼音注音。\n4. 按以下格式回复：\n解释： [四川话解释]\n拼音： [四川话拼音]"
+            prompt = f"Please provide the definition and phonetic transcription of '{pronounce_word}' in Sichuan dialect. Format your response as follows:\nDefinition: [clear and concise definition in Simplified Chinese]\nPhonetic: [Sichuan dialect phonetic transcription]"
             response = await self.llm_service.get_examples_with_prompt(prompt)
             
             if response and isinstance(response, str):
@@ -56,10 +62,10 @@ class SichuaneseStrategy(LanguageStrategy):
                 phonetic = ""
                 
                 for line in lines:
-                    if line.startswith("解释："):
-                        definition = line.replace("解释：", "").strip()
-                    elif line.startswith("拼音："):
-                        phonetic = line.replace("拼音：", "").strip()
+                    if line.startswith("Definition:"):
+                        definition = line.replace("Definition:", "").strip()
+                    elif line.startswith("Phonetic:"):
+                        phonetic = line.replace("Phonetic:", "").strip()
                 
                 return {"definition": definition, "phonetic": phonetic, "pronounce_word": pronounce_word}
                 
@@ -83,7 +89,7 @@ class SichuaneseStrategy(LanguageStrategy):
         for example in examples:
             try:
                 # 使用 LLM 服务翻译
-                prompt = f"请将以下英语句子翻译成四川话（使用简体字），不需要解释：\n{example}"
+                prompt = f"Please translate the following English sentence to Sichuan dialect (using Simplified Chinese characters). Requirements:\n1. Use natural, everyday Sichuan dialect expressions\n2. Ensure the translation follows Sichuan dialect grammar and speaking habits\n3. The translation should be fluent and natural, avoid literal translations\n4. Return ONLY the translated sentence, no additional explanations\n5. Use only Chinese characters, no letters or symbols\nSentence: {example}"
                 response = await self.llm_service.get_examples_with_prompt(prompt)
                 if response and isinstance(response, str):
                     translated.append(response)

@@ -4,9 +4,9 @@ from ..audio_base import AudioGeneratorStrategy
 from ..utils.language_utils import LanguageUtils
 
 class EnglishStrategy(LanguageStrategy):
-    """英语策略实现类"""
+    """English strategy implementation class"""
     def __init__(self):
-        """初始化英语策略"""
+        """Initialize English strategy"""
         super().__init__()
         from ..llms.llm_service import LLMService
         self.llm_service = LLMService()
@@ -14,33 +14,33 @@ class EnglishStrategy(LanguageStrategy):
         
     @property
     def tts_generator(self) -> AudioGeneratorStrategy:
-        """获取音频生成器
+        """Get audio generator
         
-        返回:
-            AudioGeneratorStrategy: 音频生成器实例
+        Returns:
+            AudioGeneratorStrategy: Audio generator instance
         """
         from ..tts.edge_tts_generator import EdgeTTSGenerator
         return EdgeTTSGenerator()
 
     async def generate_definition(self, word: str) -> dict:
-        """生成单词定义和音标
+        """Generate word definition and phonetic transcription
         
-        使用 LLM 服务生成英语定义和音标。
+        Use LLM service to generate English definition and phonetic transcription.
         
-        参数:
-            word (str): 要查询的单词
+        Args:
+            word (str): The word to query
             
-        返回:
-            dict: 包含定义和音标的字典
+        Returns:
+            dict: Dictionary containing definition and phonetic transcription
         """
         try:
-            # 判断输入词是否为中文
+            # Check if input word is Chinese
             is_chinese_word = LanguageUtils.is_chinese(word)
             pronounce_word = word
             
-            # 如果是中文词，需要翻译成英文
+            # If it's a Chinese word, translate to English
             if is_chinese_word:
-                prompt = f"请将中文词语 '{word}' 翻译成英文。要求：\n1. 只返回对应的英文词，不要其他解释\n2. 如果有多个含义，只返回最常用的一个"
+                prompt = f"Translate '{word}' to English. Requirements:\n1. Return ONLY the English word\n2. If multiple meanings exist, return ONLY the most common one\n3. Do not include any explanations or additional text"
                 response = await self.llm_service.get_examples_with_prompt(prompt)
                 if response and isinstance(response, str):
                     pronounce_word = response.strip()
@@ -49,7 +49,7 @@ class EnglishStrategy(LanguageStrategy):
             response = await self.llm_service.get_examples_with_prompt(prompt)
             
             if response and isinstance(response, str):
-                # 解析响应文本
+                # Parse response text
                 lines = response.strip().split('\n')
                 definition = ""
                 phonetic = ""
@@ -63,11 +63,11 @@ class EnglishStrategy(LanguageStrategy):
                 return {"definition": definition, "phonetic": phonetic, "pronounce_word": pronounce_word}
                 
         except Exception as e:
-            print(f"[EnglishStrategy] 生成定义错误: {e}")
+            print(f"[EnglishStrategy] Definition generation error: {e}")
             
         return {"definition": "", "phonetic": "", "pronounce_word": ""}
     
     async def translate_examples(self, examples: List[str]) -> List[str]:
-        """翻译示例句子"""
-        """英语不用实现这个方法，因为生成的模板例句就是英语的 """
+        """Translate example sentences"""
+        """This method doesn't need implementation for English since template sentences are already in English"""
         return examples

@@ -21,9 +21,13 @@ class Definition(BaseModel):
     属性:
         definition (str): 单词的释义
         phonetic (str): 单词的音标
+        pronounce_word (str): 单词的发音音频URL
+        audio_url (str): 单词的音频URL
     """
     definition: str
     phonetic: str
+    pronounce_word: str = ""
+    audio_url: str = ""
 
 class Example(BaseModel):
     """示例句子模型

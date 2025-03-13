@@ -40,7 +40,13 @@ class CantoneseStrategy(LanguageStrategy):
             
             # 如果不是中文词，需要翻译
             if not is_chinese_word:
-                prompt = f"请将英文单词 '{word}' 翻译成中文。要求：\n1. 只返回对应的中文词，不要其他解释\n2. 如果有多个含义，只返回最常用的一个"
+                prompt = f"请将英文单词 '{word}' 翻译成中文词语。要求：\n1. 只返回对应的中文词语，不要其他废话\n2. 如果有多个含义，只返回最常用的一个"
+                response = await self.llm_service.get_examples_with_prompt(prompt)
+                if response and isinstance(response, str):
+                    pronounce_word = response.strip()
+            # 如果是中文词，转换为地道的粤语用词
+            else:
+                prompt = f"Translate '{word}' to Cantonese. Requirements:\n1. Return ONLY the Cantonese word in Traditional Chinese characters\n2. If multiple expressions exist, return ONLY the most commonly used one\n3. Do not include any explanations or additional text"
                 response = await self.llm_service.get_examples_with_prompt(prompt)
                 if response and isinstance(response, str):
                     pronounce_word = response.strip()

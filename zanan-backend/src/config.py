@@ -3,7 +3,7 @@ try:
 except ImportError:
     LLM_CONFIG_LOCAL = {}
 
-# 全局存储路径配置
+# Global storage path configuration
 STORAGE_DIR = "storage"
 
 
@@ -26,28 +26,28 @@ LLM_CONFIG_LOCAL = {
     }
 }
 
-# 提示词模板配置
+# Prompt template configuration
 PROMPT_TEMPLATES = {
-    "definition": """请为词语 "{word}" 生成一个完整的定义。
-要求：
-1. 返回 JSON 格式的字符串
-2. 包含以下字段：
-   - definition: 单词的英文释义
-   - phonetic: 音标
-示例输出：
+    "definition": """Please generate a complete definition for the word "{word}".
+Requirements:
+1. Return a JSON string
+2. Include the following fields:
+   - definition: English definition of the word
+   - phonetic: phonetic transcription
+Example output:
 {{
     "definition": "A word used to express greeting or acknowledgment",
     "phonetic": "/həˈloʊ/"
 }}
 """,
     
-    "examples": """请为词语 "{word}" 生成 {count} 个地道的英文例句。
-要求：
-1. 返回 JSON 格式的字符串
-2. 包含一个例句数组
-3. 每个例句应该自然、地道，体现单词的用法
-4. 例句中只出现英文，如果有中文名词或地面翻译成拼音
-示例输出：
+    "examples": """Please generate {count} authentic English sentences using the word "{word}".
+Requirements:
+1. Return a JSON string
+2. Include an array of example sentences
+3. Each sentence should be natural and idiomatic, demonstrating proper word usage
+4. Sentences should only contain English; translate any proper nouns or place names to English or use pinyin
+Example output:
 {{
     "examples": [
         "Hello, how are you doing today?",
@@ -56,23 +56,23 @@ PROMPT_TEMPLATES = {
 }}
 """,
 
-    "random_word": """请根据以下条件生成一个英文单词：
-1. 风格类型：{style}
-2. 时间戳：{timestamp}
-3. 风格详细说明：
-   - work: 与工作、职场相关的词汇
-   - life: 日常生活中常用的词汇
-   - computer: 计算机、技术相关的词汇
-   - study: 学术、教育相关的词汇
+    "random_word": """Please generate an English word based on the following conditions:
+1. Style type: {style}
+2. Timestamp: {timestamp}
+3. Style specifications:
+   - work: vocabulary related to work and professional settings
+   - life: commonly used words in daily life
+   - computer: vocabulary related to computers and technology
+   - study: vocabulary related to academics and education
 
-要求：
-1. 返回 JSON 格式的字符串
-2. 包含一个 word 字段
-3. 单词应该是常用的、适合学习的英文单词
-4. 根据时间戳作为随机种子，生成不同的单词
-5. 确保生成的单词与指定的风格类型相符
+Requirements:
+1. Return a JSON string
+2. Include a word field
+3. The word should be common and suitable for learning
+4. Use the timestamp as a random seed to generate different words
+5. Ensure the generated word matches the specified style type
 
-示例输出：
+Example output:
 {{
     "word": "collaboration"
 }}

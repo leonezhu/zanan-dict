@@ -40,12 +40,12 @@ class MandarinStrategy(LanguageStrategy):
             
             # 如果不是中文词，需要翻译
             if not is_chinese_word:
-                prompt = f"请将英文单词 '{word}' 翻译成中文。要求：\n1. 只返回对应的中文词，不要其他解释\n2. 如果有多个含义，只返回最常用的一个"
+                prompt = f"Please translate the English word '{word}' to Chinese. Requirements:\n1. Return ONLY the Chinese word\n2. If multiple meanings exist, return ONLY the most common one\n3. Do not include any explanations or additional text"
                 response = await self.llm_service.get_examples_with_prompt(prompt)
                 if response and isinstance(response, str):
                     pronounce_word = response.strip()
             
-            prompt = f"请提供词语 '{pronounce_word}' 的中文（普通话）解释和拼音。要求：\n1. 使用简体字\n2. 解释要简洁易懂\n3. 使用汉语拼音注音（包含声调）\n4. 按以下格式回复：\n解释：[中文解释]\n拼音：[汉语拼音]"
+            prompt = f"Please provide the definition and phonetic transcription of '{pronounce_word}' in Mandarin Chinese. Format your response as follows:\nDefinition: [clear and concise definition in Simplified Chinese]\nPhonetic: [Mandarin pinyin with tone marks]"
             response = await self.llm_service.get_examples_with_prompt(prompt)
             
             if response and isinstance(response, str):
@@ -55,10 +55,10 @@ class MandarinStrategy(LanguageStrategy):
                 phonetic = ""
                 
                 for line in lines:
-                    if line.startswith("解释："):
-                        definition = line.replace("解释：", "").strip()
-                    elif line.startswith("拼音："):
-                        phonetic = line.replace("拼音：", "").strip()
+                    if line.startswith("Definition:"):
+                        definition = line.replace("Definition:", "").strip()
+                    elif line.startswith("Phonetic:"):
+                        phonetic = line.replace("Phonetic:", "").strip()
                 
                 return {"definition": definition, "phonetic": phonetic, "pronounce_word": pronounce_word}
                 
@@ -82,7 +82,7 @@ class MandarinStrategy(LanguageStrategy):
         for example in examples:
             try:
                 # 使用 LLM 服务翻译
-                prompt = f"请将以下英语句子翻译成地道的普通话（使用简体字）。要求：\n1. 使用日常对话中常见的表达方式\n2. 确保符合普通话的语法结构和表达习惯\n3. 翻译要自然流畅，避免生硬的直译\n4. 只返回翻译后的句子，不要添加任何其他说明\n5. 翻译的句子中不要出现字母和符号，只包含中文\n句子：{example}"
+                prompt = f"Please translate the following English sentence to Mandarin Chinese (using Simplified Chinese characters). Requirements:\n1. Use natural, everyday Mandarin expressions\n2. Ensure the translation follows standard Mandarin grammar and speaking habits\n3. The translation should be fluent and natural, avoid literal translations\n4. Return ONLY the translated sentence, no additional explanations\n5. Use only Chinese characters, no letters or symbols\nSentence: {example}"
                 response = await self.llm_service.get_examples_with_prompt(prompt)
                 if response and isinstance(response, str):
                     translated.append(response)

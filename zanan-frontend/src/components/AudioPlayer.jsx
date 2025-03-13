@@ -1,6 +1,27 @@
 import PropTypes from "prop-types";
+import { useState, useRef, useEffect } from "react";
 
 function AudioPlayer({ audioUrl, variant = "icon" }) {
+  const [isPlaying, setIsPlaying] = useState(false);
+  const audioRef = useRef(null);
+
+  useEffect(() => {
+    return () => {
+      if (audioRef.current) {
+        audioRef.current.pause();
+        audioRef.current = null;
+      }
+    };
+  }, []);
+
+  useEffect(() => {
+    if (audioRef.current) {
+      audioRef.current.pause();
+      audioRef.current = null;
+      setIsPlaying(false);
+    }
+  }, [audioUrl]);
+
   if (variant === "text") {
     return (
       <audio
@@ -13,16 +34,27 @@ function AudioPlayer({ audioUrl, variant = "icon" }) {
     );
   }
 
-  const handlePlay = () => {
-    const audio = new Audio(`/api/audio/${audioUrl}?t=${Date.now()}`);
-    audio.play();
+  const handlePlayPause = () => {
+    if (!audioRef.current) {
+      audioRef.current = new Audio(`/api/audio/${audioUrl}?t=${Date.now()}`);
+      audioRef.current.addEventListener('ended', () => {
+        setIsPlaying(false);
+      });
+    }
+
+    if (isPlaying) {
+      audioRef.current.pause();
+    } else {
+      audioRef.current.play();
+    }
+    setIsPlaying(!isPlaying);
   };
 
   return (
     <button
-      onClick={handlePlay}
+      onClick={handlePlayPause}
       className="audio-button"
-      title="播放发音"
+      title={isPlaying ? "暂停" : "播放发音"}
     >
       <svg
         xmlns="http://www.w3.org/2000/svg"
