@@ -6,11 +6,17 @@ except ImportError:
 # 全局存储路径配置
 STORAGE_DIR = "storage"
 
+
+# Qwen/Qwen2-7B-Instruct # *** 生成例句会有其他字符
+# Qwen/Qwen2.5-7B-Instruct **
+# deepseek-ai/DeepSeek-R1-Distill-Qwen-7B #不能用推理模型
+# internlm/internlm2_5-7b-chat # 完美 速度有点慢
+# THUDM/chatglm3-6b
 LLM_CONFIG = {
     "siliconflow": {
         "api_url": "https://api.siliconflow.cn/v1/chat/completions",
         "api_key": LLM_CONFIG_LOCAL.get("siliconflow", {}).get("api_key", ""),
-        "model": "Qwen/Qwen2-7B-Instruct"
+        "model": "internlm/internlm2_5-7b-chat"
     }
 }
 # add config_local.py than copy this 

@@ -1,6 +1,7 @@
 from typing import List
 from .language_strategy import LanguageStrategy
 from ..audio_base import AudioGeneratorStrategy
+from ..utils.language_utils import LanguageUtils
 
 class SichuaneseStrategy(LanguageStrategy):
     """四川话策略实现类"""
@@ -33,7 +34,19 @@ class SichuaneseStrategy(LanguageStrategy):
             dict: 包含定义和音标的字典
         """
         try:
-            prompt = f"请提供词语 '{word}' 的四川话解释和注音。要求：\n1. 使用简体字\n2. 解释要简洁易懂，使用地道的四川话表达\n3. 使用四川话拼音注音（参考汉语拼音，标注声调）\n4. 按以下格式回复：\n解释：[四川话解释]\n音标：[四川话拼音]"
+            # 判断输入词是否为中文
+            is_chinese_word = LanguageUtils.is_chinese(word)
+            pronounce_word = word if is_chinese_word else ""
+            
+            # 如果不是中文词，需要翻译
+            if not is_chinese_word:
+                prompt = f"请将英文单词 '{word}' 翻译成中文。要求：\n1. 只返回对应的中文词，不要其他解释\n2. 如果有多个含义，只返回最常用的一个"
+                response = await self.llm_service.get_examples_with_prompt(prompt)
+                if response and isinstance(response, str):
+                    pronounce_word = response.strip()
+            
+            # 生成定义和音标
+            prompt = f"请提供单词 '{pronounce_word}' 的四川话解释及拼音。要求：\n1. 使用简体字。\n2. 解释简洁易懂，避免混杂其他语言或符号。\n3. 使用四川话拼音注音。\n4. 按以下格式回复：\n解释： [四川话解释]\n拼音： [四川话拼音]"
             response = await self.llm_service.get_examples_with_prompt(prompt)
             
             if response and isinstance(response, str):
@@ -45,15 +58,15 @@ class SichuaneseStrategy(LanguageStrategy):
                 for line in lines:
                     if line.startswith("解释："):
                         definition = line.replace("解释：", "").strip()
-                    elif line.startswith("音标："):
-                        phonetic = line.replace("音标：", "").strip()
+                    elif line.startswith("拼音："):
+                        phonetic = line.replace("拼音：", "").strip()
                 
-                return {"definition": definition, "phonetic": phonetic}
+                return {"definition": definition, "phonetic": phonetic, "pronounce_word": pronounce_word}
                 
         except Exception as e:
-            print(f"[SichuaneseStrategy] 生成定义错误: {e}")
+            print(f"[SichuanStrategy] 生成定义错误: {e}")
             
-        return {"definition": "", "phonetic": ""}
+        return {"definition": "", "phonetic": "", "pronounce_word": ""}
     
     async def translate_examples(self, examples: List[str]) -> List[str]:
         """翻译示例句子到四川话

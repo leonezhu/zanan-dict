@@ -145,7 +145,7 @@ class DictionaryService:
         definitions_list = await asyncio.gather(*definition_tasks)
         examples_list = await asyncio.gather(*example_tasks)
         
-        # 整理结果 - 按照语言分组
+        # 整理结果
         results = {
             'definitions': {},
             'examples': {}
@@ -159,6 +159,16 @@ class DictionaryService:
         for lang, example_list in zip(languages, examples_list):
             lang_examples = []
             strategy = self.get_strategy(lang)
+            
+            # 获取发音词
+            pronounce_word = results['definitions'][lang].get('pronounce_word', '')
+            
+            # 如果有发音词，先生成发音词的音频
+            if pronounce_word:
+                audio_task = strategy.generate_audio(pronounce_word, word)
+                audio_tasks.append(audio_task)
+            
+            # 生成例句的音频
             for example in example_list:
                 # 创建音频生成任务
                 audio_task = strategy.generate_audio(example, word)
@@ -174,8 +184,14 @@ class DictionaryService:
         
         # 更新音频URL
         audio_index = 0
-        for lang_examples in results['examples'].values():
-            for example in lang_examples:
+        for lang in languages:
+            # 如果有发音词，先更新发音词的音频URL
+            if results['definitions'][lang].get('pronounce_word'):
+                results['definitions'][lang]['audio_url'] = audio_urls[audio_index] or ""
+                audio_index += 1
+            
+            # 更新例句的音频URL
+            for example in results['examples'][lang]:
                 audio_url = audio_urls[audio_index] or ""
                 example['audio_url'] = audio_url
                 audio_index += 1
